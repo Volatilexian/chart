@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <netdb.h>
 #include <string.h>
 #include <strings.h>
 #include <stdlib.h>
@@ -17,9 +18,13 @@ int main(int argc, char *argv[])
 	int addrlen = 0;
 	int port = PORT;
 
+	struct hostent *host = (struct hostent *)malloc(sizeof(struct hostent));
+	host = gethostbyname("localhost");
+
+
 	bzero(&ser_addr, sizeof(struct sockaddr_in));
 	ser_addr.sin_family = AF_INET;
-	ser_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	ser_addr.sin_addr = *((struct in_addr *)host->h_addr);
 	ser_addr.sin_port = htons(port);
 
 	if(-1 == (fd = socket(ser_addr.sin_family, SOCK_DGRAM, 0)))
@@ -30,7 +35,7 @@ int main(int argc, char *argv[])
 	printf("input what u want to say: ");
 	scanf("%s", buffer);
 	addrlen = sizeof(struct sockaddr_in);
-	if(sendto(fd, buffer, strlen(buffer), 0, (struct sockaddr *)&ser_addr, sizeof(struct sockaddr)) == -1)
+	if(sendto(fd, buffer, strlen(buffer)+1, 0, (struct sockaddr *)&ser_addr, sizeof(struct sockaddr)) == -1)
 		oops("send message failed\n");
 
 	if(recvfrom(fd, buffer, BUFSIZE, 0, (struct sockaddr *)&ser_addr, &addrlen) == -1)
