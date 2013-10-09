@@ -17,14 +17,11 @@ int main(int argc, char *argv[])
 	char buffer[BUFSIZE];
 	int addrlen = 0;
 	int port = PORT;
-
-	struct hostent *host = (struct hostent *)malloc(sizeof(struct hostent));
-	host = gethostbyname("localhost");
-
+	char addr_p[INET_ADDRSTRLEN];
 
 	bzero(&ser_addr, sizeof(struct sockaddr_in));
 	ser_addr.sin_family = AF_INET;
-	ser_addr.sin_addr = *((struct in_addr *)host->h_addr);
+	inet_pton(AF_INET, "10.10.83.62", &ser_addr.sin_addr.s_addr);
 	ser_addr.sin_port = htons(port);
 
 	if(-1 == (fd = socket(ser_addr.sin_family, SOCK_DGRAM, 0)))
@@ -33,7 +30,7 @@ int main(int argc, char *argv[])
 	printf("the client is ready now\n");
 
 	printf("input what u want to say: ");
-	scanf("%s", buffer);
+	fgets(buffer, BUFSIZE, stdin);
 	addrlen = sizeof(struct sockaddr_in);
 	if(sendto(fd, buffer, strlen(buffer)+1, 0, (struct sockaddr *)&ser_addr, sizeof(struct sockaddr)) == -1)
 		oops("send message failed\n");
@@ -41,7 +38,9 @@ int main(int argc, char *argv[])
 	if(recvfrom(fd, buffer, BUFSIZE, 0, (struct sockaddr *)&ser_addr, &addrlen) == -1)
 		oops("recevie the statu failed\n");
 
+	inet_ntop(AF_INET, &ser_addr.sin_addr.s_addr, addr_p, sizeof(addr_p));
 	printf("the statu: %s\n", buffer);
+	printf("ip: %s, port: %d\n", addr_p, ntohs(ser_addr.sin_port));
 	close(fd);
 
 	return 0;
