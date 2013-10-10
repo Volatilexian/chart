@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 	printf("the client is ready now\n\n");
 
 	printf("input what u want to say: ");
-	scanf("%s", buffer);
+	fgets(buffer, BUFSIZE, stdin);
 	addrlen = sizeof(struct sockaddr_in);
 	if(sendto(fd, buffer, strlen(buffer)+1, 0, (struct sockaddr *)&ser_addr, addrlen) == -1)
 		oops("send message failed\n");

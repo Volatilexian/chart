@@ -29,15 +29,3 @@ int gethostinfo(char **name, char **ip)
 	return 0;
 }
 
-int main(void)
-{
-	char *name;
-	char *ip;
-	gethostinfo(&name, &ip);
-
-	printf("%s, %s\n", name, ip);
-
-	free(name);free(ip);
-	return 0;
-}
-
